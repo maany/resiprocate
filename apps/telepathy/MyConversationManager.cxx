@@ -28,6 +28,7 @@
 // Test Prompts for cache testing
 #include "playback_prompt.h"
 #include "record_prompt.h"
+#include "../../resip/recon/ConversationManager.hxx"
 
 #define RESIPROCATE_SUBSYSTEM ReconSubsystem::RECON
 
@@ -108,17 +109,34 @@ MyConversationManager::createLocalParticipant()
    mLocalParticipantHandles.push_back(partHandle);
    return partHandle;
 }
+void
+MyConversationManager::destroyParticipant(ParticipantHandle partHandle) {
+   ConversationManager::destroyParticipant(partHandle);
+   // TODO emit SIGNAL for SLOT onParticipantDestroyed() or make sure that callback is registered and is being called
+   // TODO if only 2 people were involved in conversation, conversation needs to end, so emit SIGNAL for onConversationDestroyed in that case orensure that callback is appropriately registered;
+   // TODO now that conversation have been taken care of, make sure that send SIP BYE is signalled, is UserAgent responsible for this??
+}
+void
+MyConversationManager::destroyConversation(ConversationHandle convHandle) {
+   ConversationManager::destroyConversation(convHandle);
+   // TODO emit SIGNAL for SLOT onConversationDestroyed() or make sure that callback is registered and is being called
 
+}
 void
 MyConversationManager::onConversationDestroyed(ConversationHandle convHandle)
 {
    InfoLog(<< "onConversationDestroyed: handle=" << convHandle);
    mConversationHandles.remove(convHandle);
+   // TODO this is a SLOT for the SIGNAL emitted by destroyConversation() or this is invoked via normal callback registration.
+   // TODO add code to send SIP BYE i.e initiate hangup if only 2 people were involved in the conversation
+   // TODO destroy all participants in the conversation
+
 }
 
 void
 MyConversationManager::onParticipantDestroyed(ParticipantHandle partHandle)
 {
+   //TODO this is a SLOT for the SIGNAL emitted by destroyParticipant() or this is invoked via normal callback registration.
    InfoLog(<< "onParticipantDestroyed: handle=" << partHandle);
    // Remove from whatever list it is in
    mRemoteParticipantHandles.remove(partHandle);
@@ -176,6 +194,8 @@ void
 MyConversationManager::onParticipantTerminated(ParticipantHandle partHandle, unsigned int statusCode)
 {
    InfoLog(<< "onParticipantTerminated: handle=" << partHandle);
+   //TODO add code to respond to SIP Bye and send 200 OK in response
+
 }
  
 void

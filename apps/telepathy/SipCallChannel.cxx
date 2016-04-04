@@ -108,7 +108,11 @@ SipCallChannel::onHangupComplete(bool status)
 {
    if (!status) {
       InfoLog(<<"onHangupComplete, status = false");
+      //TODO make sure response code 200 is returned
+      // TODO MyConversationManager#onParticipantTerminated() is a callback, emit the appropriate Signal
+      // and connect SIGNAL with the SLOT in any earlier configuration(yet to identify)
    }
+   //TODO call ends for this participant
 }
 
 void
@@ -122,6 +126,7 @@ SipCallChannel::onAnswerComplete(bool status)
 void
 SipCallChannel::onHangup(uint reason, const QString &detailedReason, const QString &message, Tp::DBusError* error)
 {
+   //TODO make sure SIP BYE is being sent, resip should take care of it, verify
    mConnection->getConversationManager().destroyParticipant(mParticipantHandle);
 }
 
